@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="card">
+    <div class="eyebrow">Про проєкт</div>
+    <h1>Хаби підтримки</h1>
+    <p class="lead">Тихі, анонімні сторінки для паузи, дихання та підтримки. Кожен хаб — окрема точка тиші.</p>
+    <div class="divider"></div>
+    <p class="footnote">Це не сервіс. Це жест турботи. Нічого не зберігається, нічого не аналізується.</p>
+  </section>
+  <section class="card">
+    <div class="eyebrow">Список хабів</div>
+    <div class="hub-list">
+      {% for hub in hubs %}
+        <div class="hub-entry">
+          <a class="hub-item" href="/hub/{{ hub.id }}">
+            <div class="hub-id">{{ hub.id }}</div>
+            <div class="hub-content">
+              <div class="hub-title">{{ hub.index_title or hub.title }}</div>
+            </div>
+          </a>
+          <div class="hub-description">{{ hub.index_description }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section
+    class="card argument-card"
+    data-argument
+    data-idle-timeout="{{ hub.idle_timeout_ms }}"
+    data-reply-delay-min="{{ hub.reply_delay_min_ms }}"
+    data-reply-delay-max="{{ hub.reply_delay_max_ms }}"
+    data-escalation-window="{{ hub.escalation_window_ms }}"
+    data-escalation-threshold="{{ hub.escalation_threshold }}"
+    tabindex="0"
+  >
+    <h1 class="container-title">{{ hub.title }}</h1>
+    <div class="argument-field" data-argument-field></div>
+    <input
+      class="argument-input"
+      data-argument-input
+      type="text"
+      inputmode="text"
+      autocomplete="off"
+      autocapitalize="none"
+      spellcheck="false"
+      placeholder=""
+    >
+    <p class="quiet argument-hint">{{ hub.hint_line }}</p>
+    <div class="argument-dim" aria-hidden="true"></div>
+    <div class="argument-alert" data-argument-alert hidden>Досить на сьогодні.</div>
+    <div class="after-screen" data-after hidden>
+      {% for line in hub.after_lines %}
+        <p class="after-line">{{ line }}</p>
+      {% endfor %}
+    </div>
+    <script type="application/json" data-argument-responses>{{ hub.responses | tojson }}</script>
+  </section>
+{% endblock %}

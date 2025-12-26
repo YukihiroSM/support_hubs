@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section
+    class="card rage-card"
+    data-rage
+    data-idle-timeout="{{ hub.idle_timeout_ms }}"
+    data-overload-threshold="{{ hub.overload_threshold }}"
+    data-symbol-min-duration="{{ hub.symbol_duration_min_ms }}"
+    data-symbol-max-duration="{{ hub.symbol_duration_max_ms }}"
+    data-blast-count="{{ hub.blast_count }}"
+    data-blast-duration="{{ hub.blast_duration_ms }}"
+    data-overload-text="{{ hub.overload_text }}"
+    data-exhale-text="{{ hub.exhale_text }}"
+    data-exhale-delay="{{ hub.exhale_delay_ms }}"
+    tabindex="0"
+  >
+    <h1 class="container-title">{{ hub.title }}</h1>
+    <div class="rage-field" data-rage-field>
+      <input
+        class="rage-input"
+        data-rage-input
+        type="text"
+        inputmode="text"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        aria-label="Ввід"
+      >
+    </div>
+    <p class="quiet rage-hint">{{ hub.hint_line }}</p>
+    <div class="rage-overlay" data-rage-overlay hidden>{{ hub.overload_text }}</div>
+    <div class="after-screen" data-after hidden>
+      {% for line in hub.after_lines %}
+        <p class="after-line">{{ line }}</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

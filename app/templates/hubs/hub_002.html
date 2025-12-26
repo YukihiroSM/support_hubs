@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section
+    class="card shards-card"
+    data-shards
+    data-overload-threshold="{{ hub.overload_threshold }}"
+    data-max-words="{{ hub.max_words }}"
+    data-word-duration="{{ hub.word_duration_s }}"
+    data-release-duration="{{ hub.release_duration_ms }}"
+  >
+    <h1 class="container-title">{{ hub.title }}</h1>
+    <div class="shards-field" data-shards-field>
+      <div class="shards-words" data-shards-words></div>
+      <div class="shards-input-wrap">
+        <input
+          class="shards-input"
+          data-shards-input
+          type="text"
+          inputmode="text"
+          autocomplete="off"
+          autocapitalize="none"
+          placeholder="{{ hub.placeholder }}"
+        >
+      </div>
+    </div>
+    <p class="quiet shards-hint">{{ hub.hint_line }}</p>
+    <div class="after-screen" data-after hidden>
+      {% for line in hub.after_lines %}
+        <p class="after-line">{{ line }}</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section
+    class="card container-card"
+    data-container
+    data-fade-start="{{ hub.fade_start_ms }}"
+    data-fade-end="{{ hub.fade_end_ms }}"
+    data-delete-after="{{ hub.delete_after_ms }}"
+    data-delete-interval="{{ hub.delete_interval_ms }}"
+    data-release-duration="{{ hub.release_duration_ms }}"
+  >
+    <h1 class="container-title">{{ hub.title }}</h1>
+    <form class="container-form" autocomplete="off">
+      <div class="container-input">
+        <textarea class="container-textarea" name="release" placeholder="{{ hub.placeholder }}"></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn btn-accent release-button" type="button" data-release-button>{{ hub.button_label }}</button>
+      </div>
+    </form>
+    <div class="after-screen" data-after hidden>
+      <p class="after-line">{{ hub.after_primary }}</p>
+      {% if hub.after_secondary %}
+        <p class="after-line">{{ hub.after_secondary }}</p>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

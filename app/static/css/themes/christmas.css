@@ -1,0 +1,176 @@
+body.theme-christmas {
+  --holiday-snow: rgba(214, 221, 207, 0.12);
+  --holiday-glow: rgba(209, 177, 76, 0.28);
+  --holiday-green: rgba(62, 82, 55, 0.55);
+  --holiday-red: rgba(122, 52, 46, 0.55);
+  --holiday-gold: rgba(209, 177, 76, 0.75);
+  background-image:
+    linear-gradient(160deg, #0e140f, #111612 45%, #151c15),
+    radial-gradient(circle at 12% 14%, rgba(122, 52, 46, 0.18), transparent 45%),
+    radial-gradient(circle at 82% 12%, rgba(62, 82, 55, 0.2), transparent 50%);
+}
+
+.theme-layer.theme-christmas::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 10% 12%, rgba(122, 52, 46, 0.18), transparent 46%),
+    radial-gradient(circle at 80% 8%, rgba(62, 82, 55, 0.2), transparent 48%),
+    radial-gradient(circle at 50% 92%, rgba(209, 177, 76, 0.12), transparent 60%);
+  opacity: 0.7;
+}
+
+.theme-layer.theme-christmas::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, var(--holiday-snow) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(209, 177, 76, 0.08) 0 1.5px, transparent 3px);
+  background-size: 44px 44px, 120px 120px;
+  background-position: 0 0, 30px 60px;
+  opacity: 0.55;
+}
+
+.christmas-snow {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(214, 221, 207, 0.24) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(214, 221, 207, 0.2) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(214, 221, 207, 0.16) 0 1px, transparent 2px);
+  background-size: 60px 60px, 90px 90px, 130px 130px;
+  background-position: 10px 20px, 50px 80px, 90px 30px;
+  opacity: 0.75;
+  animation: snow-drift 55s linear infinite;
+}
+
+.christmas-garland {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 78px;
+}
+
+.christmas-garland::before {
+  content: "";
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  top: 10px;
+  height: 54px;
+  border-bottom: 2px solid rgba(96, 114, 82, 0.9);
+  border-radius: 0 0 60% 60%;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+.christmas-garland .bulb {
+  position: absolute;
+  width: 12px;
+  height: 18px;
+  border-radius: 50% 50% 45% 45%;
+  background: var(--holiday-gold);
+  box-shadow: 0 0 16px rgba(209, 177, 76, 0.6);
+  opacity: 0.95;
+  animation: bulb-twinkle 12s ease-in-out infinite;
+}
+
+.christmas-garland .bulb::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 2px;
+  height: 5px;
+  background: rgba(100, 112, 88, 0.7);
+  transform: translateX(-50%);
+}
+
+.christmas-garland .bulb:nth-child(2),
+.christmas-garland .bulb:nth-child(6),
+.christmas-garland .bulb:nth-child(9) {
+  background: var(--holiday-red);
+  box-shadow: 0 0 16px rgba(122, 52, 46, 0.6);
+}
+
+.christmas-garland .bulb:nth-child(3),
+.christmas-garland .bulb:nth-child(7) {
+  background: var(--holiday-green);
+  box-shadow: 0 0 16px rgba(62, 82, 55, 0.6);
+}
+
+.christmas-garland .bulb:nth-child(1) { left: 6%; top: 24px; animation-delay: 0s; }
+.christmas-garland .bulb:nth-child(2) { left: 16%; top: 34px; animation-delay: 1.8s; }
+.christmas-garland .bulb:nth-child(3) { left: 28%; top: 38px; animation-delay: 0.8s; }
+.christmas-garland .bulb:nth-child(4) { left: 40%; top: 40px; animation-delay: 2.6s; }
+.christmas-garland .bulb:nth-child(5) { left: 52%; top: 38px; animation-delay: 1.2s; }
+.christmas-garland .bulb:nth-child(6) { left: 64%; top: 34px; animation-delay: 2.2s; }
+.christmas-garland .bulb:nth-child(7) { left: 74%; top: 30px; animation-delay: 0.4s; }
+.christmas-garland .bulb:nth-child(8) { left: 84%; top: 26px; animation-delay: 1.6s; }
+.christmas-garland .bulb:nth-child(9) { left: 92%; top: 22px; animation-delay: 2.8s; }
+.christmas-garland .bulb:nth-child(10) { left: 46%; top: 42px; animation-delay: 3.4s; }
+
+.christmas-ornament {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 72px;
+  background: rgba(209, 177, 76, 0.35);
+  border: 1px solid rgba(209, 177, 76, 0.55);
+  box-shadow: 0 0 14px rgba(209, 177, 76, 0.35);
+  opacity: 0.85;
+}
+
+.christmas-ornament.left {
+  left: 18px;
+}
+
+.christmas-ornament.right {
+  right: 18px;
+}
+
+.christmas-ornament::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 2px;
+  height: 10px;
+  background: rgba(100, 112, 88, 0.7);
+  transform: translateX(-50%);
+}
+
+@keyframes bulb-twinkle {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes snow-drift {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(40px);
+  }
+}
+
+body.theme-christmas .brand-mark {
+  box-shadow: 0 0 16px rgba(209, 177, 76, 0.25);
+}
+
+body.theme-christmas .card {
+  border-color: rgba(73, 86, 65, 0.8);
+  background: linear-gradient(160deg, rgba(16, 20, 16, 0.98), rgba(22, 27, 20, 0.98));
+}
+
+body.theme-christmas .brand {
+  color: rgba(214, 221, 207, 0.8);
+}

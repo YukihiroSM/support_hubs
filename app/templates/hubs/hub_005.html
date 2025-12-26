@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section
+    class="card light-card"
+    data-light
+    data-idle-timeout="{{ hub.idle_timeout_ms }}"
+    data-after-delay="{{ hub.after_delay_ms }}"
+    data-min-chars="{{ hub.min_chars }}"
+  >
+    <h1 class="container-title">{{ hub.title }}</h1>
+    <p class="quiet light-prompt">{{ hub.prompt_line }}</p>
+    <div class="light-body">
+      <div class="light-display" data-light-display></div>
+      <textarea
+        class="light-input"
+        data-light-input
+        name="light"
+        placeholder=""
+        rows="4"
+      ></textarea>
+    </div>
+    <p class="light-affirmation" data-light-affirmation hidden>{{ hub.affirmation_line }}</p>
+    <div class="after-screen" data-after hidden>
+      {% for line in hub.after_lines %}
+        <p class="after-line">{{ line }}</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

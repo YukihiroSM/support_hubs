@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if hub.kind == "container" %}
+    <section
+      class="card container-card"
+      data-container
+      data-fade-start="{{ hub.fade_start_ms }}"
+      data-fade-end="{{ hub.fade_end_ms }}"
+      data-delete-after="{{ hub.delete_after_ms }}"
+      data-delete-interval="{{ hub.delete_interval_ms }}"
+      data-release-duration="{{ hub.release_duration_ms }}"
+    >
+      <h1 class="container-title">{{ hub.title }}</h1>
+      <form class="container-form" autocomplete="off">
+        <div class="container-input">
+          <textarea class="container-textarea" name="release" placeholder="{{ hub.placeholder }}"></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn btn-accent release-button" type="button" data-release-button>{{ hub.button_label }}</button>
+        </div>
+      </form>
+      <div class="after-screen" data-after hidden>
+        <p class="after-line">{{ hub.after_primary }}</p>
+        {% if hub.after_secondary %}
+          <p class="after-line">{{ hub.after_secondary }}</p>
+        {% endif %}
+      </div>
+    </section>
+  {% elif hub.kind == "shards" %}
+    <section
+      class="card shards-card"
+      data-shards
+      data-overload-threshold="{{ hub.overload_threshold }}"
+      data-max-words="{{ hub.max_words }}"
+      data-word-duration="{{ hub.word_duration_s }}"
+      data-release-duration="{{ hub.release_duration_ms }}"
+    >
+      <h1 class="container-title">{{ hub.title }}</h1>
+      <div class="shards-field" data-shards-field>
+        <div class="shards-words" data-shards-words></div>
+        <div class="shards-input-wrap">
+          <input
+            class="shards-input"
+            data-shards-input
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            autocapitalize="none"
+            placeholder="{{ hub.placeholder }}"
+          >
+        </div>
+      </div>
+      <p class="quiet shards-hint">{{ hub.hint_line }}</p>
+      <div class="after-screen" data-after hidden>
+        {% for line in hub.after_lines %}
+          <p class="after-line">{{ line }}</p>
+        {% endfor %}
+      </div>
+    </section>
+  {% elif hub.kind == "rage" %}
+    <section
+      class="card rage-card"
+      data-rage
+      data-idle-timeout="{{ hub.idle_timeout_ms }}"
+      data-overload-threshold="{{ hub.overload_threshold }}"
+      data-symbol-min-duration="{{ hub.symbol_duration_min_ms }}"
+      data-symbol-max-duration="{{ hub.symbol_duration_max_ms }}"
+      data-blast-count="{{ hub.blast_count }}"
+      data-blast-duration="{{ hub.blast_duration_ms }}"
+      data-overload-text="{{ hub.overload_text }}"
+      data-exhale-text="{{ hub.exhale_text }}"
+      data-exhale-delay="{{ hub.exhale_delay_ms }}"
+      tabindex="0"
+    >
+      <h1 class="container-title">{{ hub.title }}</h1>
+      <div class="rage-field" data-rage-field></div>
+      <input
+        class="rage-input"
+        data-rage-input
+        type="text"
+        inputmode="text"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        aria-label="Ввід"
+      >
+      <p class="quiet rage-hint">{{ hub.hint_line }}</p>
+      <div class="rage-overlay" data-rage-overlay hidden>{{ hub.overload_text }}</div>
+      <div class="after-screen" data-after hidden>
+        {% for line in hub.after_lines %}
+          <p class="after-line">{{ line }}</p>
+        {% endfor %}
+      </div>
+    </section>
+  {% elif hub.kind == "argument" %}
+    <section
+      class="card argument-card"
+      data-argument
+      data-idle-timeout="{{ hub.idle_timeout_ms }}"
+      data-reply-delay-min="{{ hub.reply_delay_min_ms }}"
+      data-reply-delay-max="{{ hub.reply_delay_max_ms }}"
+      data-escalation-window="{{ hub.escalation_window_ms }}"
+      data-escalation-threshold="{{ hub.escalation_threshold }}"
+      tabindex="0"
+    >
+      <h1 class="container-title">{{ hub.title }}</h1>
+      <div class="argument-field" data-argument-field></div>
+      <input
+        class="argument-input"
+        data-argument-input
+        type="text"
+        inputmode="text"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        placeholder=""
+      >
+      <p class="quiet argument-hint">{{ hub.hint_line }}</p>
+      <div class="argument-dim" aria-hidden="true"></div>
+      <div class="argument-alert" data-argument-alert hidden>Досить на сьогодні.</div>
+      <div class="after-screen" data-after hidden>
+        {% for line in hub.after_lines %}
+          <p class="after-line">{{ line }}</p>
+        {% endfor %}
+      </div>
+      <script type="application/json" data-argument-responses>{{ hub.responses | tojson }}</script>
+    </section>
+  {% else %}
+    <section class="card">
+      <div class="eyebrow">Хаб підтримки {{ hub.id }}</div>
+      <h1>{{ hub.title }}</h1>
+      {% if hub.lead %}
+        <p class="lead">{{ hub.lead }}</p>
+      {% endif %}
+
+      {% if hub.kind in ["write", "girly"] %}
+        <form data-release>
+          <textarea name="release" placeholder="{{ hub.placeholder }}"></textarea>
+          <div class="actions">
+            <button class="btn btn-accent" type="submit">{{ hub.button_label }}</button>
+          </div>
+          <div class="release-hint" data-release-hint hidden>{{ hub.hint }}</div>
+        </form>
+      {% elif hub.kind == "listen" %}
+        <div class="audio-shell">
+          <audio controls preload="none">
+            <source src="{{ hub.audio_src }}" type="audio/mpeg">
+          </audio>
+          <p class="footnote">Файл треку: <span class="quiet">{{ hub.audio_file }}</span> у каталозі <span class="quiet">/static/assets/audio</span>.</p>
+        </div>
+      {% elif hub.kind == "ground" %}
+        <ul class="list-compact">
+          {% for step in hub.steps %}
+            <li>{{ step }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% if hub.show_footer %}
+        <div class="divider"></div>
+        <p class="footnote">Нічого не зберігається. Сторінка не веде логів і не має аналітики.</p>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

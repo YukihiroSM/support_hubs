@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="protocol-card" data-protocol>
+    <header class="protocol-header">
+      <p class="protocol-kicker">СЛУЖБОВИЙ ПРОТОКОЛ</p>
+      <div class="protocol-meta">
+        <div class="protocol-meta-row">
+          <span class="protocol-label">ID</span>
+          <span class="protocol-value">018</span>
+        </div>
+        <div class="protocol-meta-row">
+          <span class="protocol-label">Дата</span>
+          <span class="protocol-value">24.02.2022</span>
+        </div>
+        <div class="protocol-meta-row">
+          <span class="protocol-label">Статус</span>
+          <span class="protocol-value">ВИКОНАННЯ ТРИВАЄ</span>
+        </div>
+      </div>
+      <div class="protocol-divider"></div>
+      <div class="protocol-legend">
+        <span class="protocol-tag">R1: основне</span>
+        <span class="protocol-tag">S0: без уточнень</span>
+        <span class="protocol-tag">T: тимчасово</span>
+      </div>
+    </header>
+    <div class="protocol-lines" aria-live="polite">
+      <p class="protocol-line line-1" data-protocol-line>01. ПЛАН БУВ</p>
+      <p class="protocol-line line-2" data-protocol-line>02. Потім він змінився.</p>
+      <p class="protocol-line line-3" data-protocol-line>03. Робота триває</p>
+    </div>
+    <div class="protocol-body">
+      <div class="protocol-section">
+        <p class="protocol-section-title">ПІДСТАВА</p>
+        <p class="protocol-text">
+          Вхідні умови змінені під час виконання. Уточнення не потрібні,
+          збережено дієздатність процесу.
+        </p>
+      </div>
+      <div class="protocol-section">
+        <p class="protocol-section-title">СТАТУС</p>
+        <ul class="protocol-list">
+          <li>Основні кроки виконуються в поточній конфігурації.</li>
+          <li>Тимчасові рішення залишаються чинними.</li>
+          <li>Канали зв’язку стабільні.</li>
+        </ul>
+      </div>
+      <div class="protocol-section">
+        <p class="protocol-section-title">ЗАВДАННЯ</p>
+        <ul class="protocol-list">
+          <li>Звірити доступні ресурси без додаткових запитів.</li>
+          <li>Оновити черговість дій у межах зміни.</li>
+          <li>Зафіксувати коротку нотатку про зміни.</li>
+          <li>Знищити підарів.</li>
+        </ul>
+      </div>
+      <div class="protocol-section protocol-fields">
+        <div class="protocol-field">
+          <span class="protocol-field-label">Відповідальний</span>
+          <span class="protocol-field-value">черговий координатор</span>
+        </div>
+        <div class="protocol-field">
+          <span class="protocol-field-label">Рівень</span>
+          <span class="protocol-field-value">R1 / T</span>
+        </div>
+        <div class="protocol-field">
+          <span class="protocol-field-label">Код</span>
+          <span class="protocol-field-value">PR-018/24</span>
+        </div>
+      </div>
+    </div>
+    <div class="protocol-stamp" aria-hidden="true">
+      <div class="protocol-stamp-ring">
+        <span>ПІДТВЕРДЖЕНО</span>
+        <span>ХАБ 018 · ПРОТОКОЛ</span>
+      </div>
+      <div class="protocol-stamp-core">OK</div>
+    </div>
+    <p class="protocol-note" data-protocol-note>Уточнення не потребує.</p>
+  </section>
+{% endblock %}

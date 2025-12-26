@@ -1,8 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="silence-card cloud-card" data-cloud>
-    <div class="cloud-shape" aria-hidden="true"></div>
+  <section
+    class="silence-card cloud-card"
+    data-clouds
+    data-cloud-min="170,176,182"
+    data-cloud-max="235,238,242"
+    data-cloud-mode="same"
+  >
+    <div class="clouds-layer" aria-hidden="true"></div>
     <p class="cloud-line">Можна бути легше</p>
   </section>
 {% endblock %}

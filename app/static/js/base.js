@@ -1408,6 +1408,779 @@ const initCloudHub = (card) => {
 
 document.querySelectorAll("[data-cloud]").forEach(initCloudHub);
 
+// Cloud fragments inspired by https://github.com/m5n/clouds (MIT).
+const initCloudsHub = (card) => {
+  const layer = card.querySelector(".clouds-layer");
+  if (!layer) {
+    return;
+  }
+
+  const parseColor = (value, fallback) => {
+    if (!value) {
+      return fallback;
+    }
+    const parts = value
+      .split(",")
+      .map((item) => Number(item.trim()))
+      .filter((item) => Number.isFinite(item));
+    if (parts.length < 3) {
+      return fallback;
+    }
+    return parts.slice(0, 3);
+  };
+
+  const toNumber = (value, fallback) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  };
+
+  const minColor = parseColor(card.dataset.cloudMin, [170, 176, 182]);
+  const maxColor = parseColor(card.dataset.cloudMax, [235, 238, 242]);
+  const colorMode = card.dataset.cloudMode || "";
+  const fragmentCount = Math.max(6, toNumber(card.dataset.cloudCount, 20));
+  const intervalMs = Math.max(140, toNumber(card.dataset.cloudInterval, 220));
+
+  const fragments = [];
+  let pointerX = 0;
+  let pointerY = 0;
+
+  const getFragmentData = () => {
+    const rect = layer.getBoundingClientRect();
+    const width = Math.max(1, rect.width);
+    const height = Math.max(1, rect.height);
+    const posX = Math.round(Math.random() * width) - width / 6;
+    const posY = Math.round(Math.random() * height) - height / 3.5;
+
+    let color = "rgb(";
+    for (let ii = 0; ii < minColor.length; ii += 1) {
+      if (ii > 0) {
+        color += ",";
+      }
+      const range = maxColor[ii] - minColor[ii];
+      const value = minColor[ii] + Math.round(Math.random() * range);
+      if (colorMode === "same") {
+        color += `${value},${value},${value}`;
+        break;
+      } else {
+        color += value;
+      }
+    }
+    color += ")";
+
+    return {
+      posX,
+      posY,
+      color,
+      scale: 0.88 + Math.random() * 0.26,
+    };
+  };
+
+  const applyPointer = () => {
+    const intensity = Math.min(1, Math.hypot(pointerX, pointerY) * 1.6);
+    fragments.forEach((fragment) => {
+      const depth = Number(fragment.dataset.depth || 0.5);
+      const shiftX = pointerX * 60 * depth;
+      const shiftY = pointerY * 46 * depth;
+      const pointerScale = 1 + intensity * 0.08 * depth;
+      fragment.style.setProperty("--cloud-shift-x", `${shiftX.toFixed(2)}px`);
+      fragment.style.setProperty("--cloud-shift-y", `${shiftY.toFixed(2)}px`);
+      fragment.style.setProperty(
+        "--cloud-pointer-scale",
+        pointerScale.toFixed(3),
+      );
+    });
+  };
+
+  const updateFragment = (id) => {
+    if (!fragments.length) {
+      return;
+    }
+    const data = getFragmentData();
+    const index =
+      typeof id === "number"
+        ? Math.max(0, Math.min(fragments.length - 1, id))
+        : Math.floor(Math.random() * fragments.length);
+    const fragment = fragments[index];
+    fragment.classList.toggle("is-moving");
+    fragment.style.left = `${data.posX}px`;
+    fragment.style.top = `${data.posY}px`;
+    fragment.style.backgroundColor = data.color;
+    fragment.style.setProperty("--cloud-scale", data.scale.toFixed(3));
+  };
+
+  for (let ii = 0; ii < fragmentCount; ii += 1) {
+    const fragment = document.createElement("span");
+    fragment.className = "cloud-fragment";
+    fragment.style.zIndex = String(99 - Math.round((99 / fragmentCount) * ii));
+    fragment.dataset.depth = String(0.35 + (ii / fragmentCount) * 0.65);
+    layer.appendChild(fragment);
+    fragments.push(fragment);
+    updateFragment(ii);
+  }
+
+  const intervalId = window.setInterval(updateFragment, intervalMs);
+
+  const refresh = () => {
+    fragments.forEach((_, index) => updateFragment(index));
+  };
+
+  window.addEventListener("resize", refresh, { passive: true });
+
+  const updatePointer = (clientX, clientY) => {
+    const rect = card.getBoundingClientRect();
+    const relX = rect.width
+      ? (clientX - rect.left) / rect.width - 0.5
+      : 0;
+    const relY = rect.height
+      ? (clientY - rect.top) / rect.height - 0.5
+      : 0;
+    pointerX = Math.max(-0.5, Math.min(0.5, relX));
+    pointerY = Math.max(-0.5, Math.min(0.5, relY));
+    applyPointer();
+  };
+
+  const clearPointer = () => {
+    pointerX = 0;
+    pointerY = 0;
+    applyPointer();
+  };
+
+  card.addEventListener("pointermove", (event) => {
+    updatePointer(event.clientX, event.clientY);
+  });
+  card.addEventListener("pointerleave", clearPointer);
+  card.addEventListener("pointerdown", (event) => {
+    updatePointer(event.clientX, event.clientY);
+  });
+  card.addEventListener(
+    "touchmove",
+    (event) => {
+      const touch = event.touches[0];
+      if (touch) {
+        updatePointer(touch.clientX, touch.clientY);
+      }
+    },
+    { passive: true },
+  );
+  card.addEventListener("touchend", clearPointer, { passive: true });
+  window.addEventListener(
+    "pagehide",
+    () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("resize", refresh);
+    },
+    { once: true },
+  );
+};
+
+document.querySelectorAll("[data-clouds]").forEach(initCloudsHub);
+
+const initIronyHub = (card) => {
+  const epilogue = card.querySelector("[data-irony-epilogue]");
+  if (!epilogue) {
+    return;
+  }
+
+  const threshold = Math.max(2, Number(card.dataset.ironyThreshold || 3));
+  let taps = 0;
+
+  const handleTap = () => {
+    if (card.classList.contains("is-acknowledged")) {
+      return;
+    }
+    taps += 1;
+    if (taps >= threshold) {
+      card.classList.add("is-acknowledged");
+    }
+  };
+
+  card.addEventListener("pointerdown", handleTap);
+};
+
+document.querySelectorAll("[data-irony]").forEach(initIronyHub);
+
+const initWonkyHub = (card) => {
+  const item = card.querySelector("[data-wonky-item]");
+  if (!item) {
+    return;
+  }
+
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  let dragging = false;
+  let startX = 0;
+  let startY = 0;
+
+  const setOffset = (x, y) => {
+    item.style.setProperty("--wonky-drag-x", `${x}px`);
+    item.style.setProperty("--wonky-drag-y", `${y}px`);
+  };
+
+  const release = () => {
+    if (!dragging) {
+      return;
+    }
+    dragging = false;
+    item.classList.remove("is-dragging");
+    setOffset(0, 0);
+  };
+
+  item.addEventListener("pointerdown", (event) => {
+    dragging = true;
+    startX = event.clientX;
+    startY = event.clientY;
+    item.classList.add("is-dragging");
+    if (item.setPointerCapture) {
+      item.setPointerCapture(event.pointerId);
+    }
+  });
+
+  item.addEventListener("pointermove", (event) => {
+    if (!dragging) {
+      return;
+    }
+    const dx = clamp(event.clientX - startX, -18, 18);
+    const dy = clamp(event.clientY - startY, -14, 14);
+    setOffset(dx, dy);
+  });
+
+  item.addEventListener("pointerup", release);
+  item.addEventListener("pointercancel", release);
+  item.addEventListener("pointerleave", release);
+  item.addEventListener("lostpointercapture", release);
+};
+
+document.querySelectorAll("[data-wonky]").forEach(initWonkyHub);
+
+const initProtocolHub = (card) => {
+  const note = card.querySelector("[data-protocol-note]");
+  const lines = Array.from(card.querySelectorAll("[data-protocol-line]"));
+  if (!note || !lines.length) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const charDelay = 42;
+  const linePause = 900;
+  let startDelay = 3200;
+
+  const typeLine = (line, text, delay) => {
+    window.setTimeout(() => {
+      let index = 0;
+      line.classList.add("is-typing");
+      const timer = window.setInterval(() => {
+        index += 1;
+        line.textContent = text.slice(0, index);
+        if (index >= text.length) {
+          window.clearInterval(timer);
+          line.classList.remove("is-typing");
+        }
+      }, charDelay);
+    }, delay);
+  };
+
+  lines.forEach((line) => {
+    const text = (line.dataset.text || line.textContent || "").trim();
+    line.dataset.text = text;
+    if (prefersReducedMotion) {
+      line.textContent = text;
+      return;
+    }
+    line.textContent = "";
+    typeLine(line, text, startDelay);
+    startDelay += text.length * charDelay + linePause;
+  });
+
+  const handleTap = () => {
+    if (card.classList.contains("is-noted")) {
+      return;
+    }
+    card.classList.add("is-noted");
+  };
+
+  card.addEventListener("pointerdown", handleTap);
+};
+
+document.querySelectorAll("[data-protocol]").forEach(initProtocolHub);
+
+const initFactHub = (card) => {
+  const button = card.querySelector("[data-fact-button]");
+  const note = card.querySelector("[data-fact-note]");
+  if (!button || !note) {
+    return;
+  }
+
+  const initialMessages = [
+    "Факт підтверджено.",
+    "Факт підтверджено повторно.",
+    "Додаткових даних не зʼявилось.",
+  ];
+  const cycleMessages = [
+    "Стан без змін.",
+    "Факт залишається фактом.",
+    "Оновлень немає.",
+  ];
+  let clicks = 0;
+
+  const setNote = (text) => {
+    note.textContent = text;
+    card.classList.add("is-confirmed");
+  };
+
+  button.addEventListener("click", () => {
+    clicks += 1;
+    if (clicks <= initialMessages.length) {
+      setNote(initialMessages[clicks - 1]);
+      return;
+    }
+    const cycleIndex =
+      (clicks - initialMessages.length - 1) % cycleMessages.length;
+    setNote(cycleMessages[cycleIndex]);
+  });
+};
+
+document.querySelectorAll("[data-fact]").forEach(initFactHub);
+
+const initFinalHub = (card) => {
+  const stack = card.querySelector("[data-final-stack]");
+  const finalLine = card.querySelector("[data-final-line]");
+  if (!stack || !finalLine) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const phaseOne = [
+    "Ситуація складна.",
+    "План був.",
+    "Він змінився.",
+    "Робота триває.",
+    "Факт підтверджено.",
+  ];
+  const phaseTwo = ["Оновлень немає.", "Все стабільно."];
+  const startDelay = 1200;
+  const phaseOneInterval = 520;
+  const phaseTwoInterval = 360;
+  const shakeDuration = 1200;
+  const clearDelay = 520;
+  const finalDelay = 1500;
+
+  if (prefersReducedMotion) {
+    window.setTimeout(() => {
+      card.classList.add("is-final");
+    }, 400);
+    return;
+  }
+
+  const addPhrase = (text) => {
+    const phrase = document.createElement("span");
+    phrase.className = "final-phrase";
+    phrase.textContent = text;
+    const offsetX = (Math.random() - 0.5) * 36;
+    const offsetY = (Math.random() - 0.5) * 22;
+    const opacity = 0.84 + Math.random() * 0.12;
+    phrase.style.setProperty("--offset-x", `${offsetX.toFixed(1)}px`);
+    phrase.style.setProperty("--offset-y", `${offsetY.toFixed(1)}px`);
+    phrase.style.setProperty("--phrase-opacity", opacity.toFixed(2));
+    stack.appendChild(phrase);
+  };
+
+  let timeline = startDelay;
+  phaseOne.forEach((text) => {
+    window.setTimeout(() => addPhrase(text), timeline);
+    timeline += phaseOneInterval;
+  });
+
+  phaseTwo.forEach((text) => {
+    window.setTimeout(() => addPhrase(text), timeline);
+    timeline += phaseTwoInterval;
+  });
+
+  window.setTimeout(() => {
+    card.classList.add("is-shaking");
+    window.setTimeout(() => {
+      card.classList.remove("is-shaking");
+    }, shakeDuration);
+  }, startDelay + phaseOne.length * phaseOneInterval);
+
+  window.setTimeout(() => {
+    stack.innerHTML = "";
+    window.setTimeout(() => {
+      card.classList.add("is-final");
+    }, finalDelay);
+  }, timeline + clearDelay);
+};
+
+document.querySelectorAll("[data-final]").forEach(initFinalHub);
+
+const initStandHub = (card) => {
+  const layers = Array.from(card.querySelectorAll("[data-stand-layer]"));
+  const line = card.querySelector("[data-stand-line]");
+  if (!layers.length) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  let targetX = 0;
+  let targetY = 0;
+  let currentX = 0;
+  let currentY = 0;
+  let intensity = 0;
+  let lastInput = performance.now();
+  let rafId = 0;
+
+  const boost = () => {
+    intensity = Math.min(1, intensity + 0.28);
+    lastInput = performance.now();
+  };
+
+  const updateTarget = (clientX, clientY) => {
+    const rect = card.getBoundingClientRect();
+    const relX = rect.width
+      ? (clientX - rect.left) / rect.width - 0.5
+      : 0;
+    const relY = rect.height
+      ? (clientY - rect.top) / rect.height - 0.5
+      : 0;
+    targetX = clamp(relX, -0.5, 0.5);
+    targetY = clamp(relY, -0.5, 0.5);
+    boost();
+  };
+
+  const applyOffsets = () => {
+    const amplitude = 14 + intensity * 32;
+    layers.forEach((layer) => {
+      const depth = Number(layer.dataset.depth || 0.5);
+      const offsetX = currentX * amplitude * depth;
+      const offsetY = currentY * amplitude * depth;
+      layer.style.transform = `translate(${offsetX.toFixed(2)}px, ${offsetY.toFixed(2)}px)`;
+    });
+  };
+
+  const step = () => {
+    const now = performance.now();
+    if (now - lastInput > 1200) {
+      targetX *= 0.92;
+      targetY *= 0.92;
+    }
+    currentX += (targetX - currentX) * 0.1;
+    currentY += (targetY - currentY) * 0.1;
+    intensity = Math.max(0, intensity - 0.003);
+    applyOffsets();
+    rafId = window.requestAnimationFrame(step);
+  };
+
+  rafId = window.requestAnimationFrame(step);
+
+  if (line) {
+    window.setTimeout(() => {
+      card.classList.add("is-revealed");
+    }, prefersReducedMotion ? 0 : 10000);
+  }
+
+  card.addEventListener("pointermove", (event) => {
+    updateTarget(event.clientX, event.clientY);
+  });
+
+  card.addEventListener("pointerdown", (event) => {
+    updateTarget(event.clientX, event.clientY);
+  });
+
+  card.addEventListener(
+    "touchmove",
+    (event) => {
+      const touch = event.touches[0];
+      if (touch) {
+        updateTarget(touch.clientX, touch.clientY);
+      }
+    },
+    { passive: true },
+  );
+
+  card.addEventListener(
+    "wheel",
+    (event) => {
+      targetY = clamp(targetY + Math.sign(event.deltaY) * 0.18, -0.5, 0.5);
+      boost();
+    },
+    { passive: true },
+  );
+
+  window.addEventListener(
+    "pagehide",
+    () => {
+      window.cancelAnimationFrame(rafId);
+    },
+    { once: true },
+  );
+};
+
+document.querySelectorAll("[data-stand]").forEach(initStandHub);
+
+const initHoldHub = (card) => {
+  const wall = card.querySelector("[data-hold-wall]");
+  const line = card.querySelector("[data-hold-line]");
+  if (!wall) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const startDelay = 3600;
+  const rampDuration = 7600;
+  const relaxDelay = 5600;
+  const relaxAmount = 0.12;
+
+  const startTime = performance.now();
+  let lastInput = startTime;
+  let current = 0;
+  let rafId = 0;
+  let isStable = false;
+
+  if (prefersReducedMotion) {
+    card.style.setProperty("--pressure", "1");
+    if (line) {
+      card.classList.add("is-stable");
+    }
+    return;
+  }
+
+  const markInput = () => {
+    lastInput = performance.now();
+  };
+
+  const step = () => {
+    const now = performance.now();
+    const elapsed = now - startTime;
+    let base = 0;
+    if (elapsed > startDelay) {
+      base = Math.min(1, (elapsed - startDelay) / rampDuration);
+    }
+    if (base >= 1 && !isStable) {
+      isStable = true;
+      if (line) {
+        card.classList.add("is-stable");
+      }
+    }
+
+    const idleFor = now - lastInput;
+    const relax =
+      base >= 1 && idleFor > relaxDelay ? relaxAmount : 0;
+    const target = Math.max(0, base - relax);
+    current += (target - current) * 0.06;
+    card.style.setProperty("--pressure", current.toFixed(3));
+    rafId = window.requestAnimationFrame(step);
+  };
+
+  rafId = window.requestAnimationFrame(step);
+
+  card.addEventListener("pointerdown", markInput);
+  card.addEventListener("pointermove", markInput);
+  card.addEventListener("touchmove", markInput, { passive: true });
+  card.addEventListener("wheel", markInput, { passive: true });
+
+  window.addEventListener(
+    "pagehide",
+    () => {
+      window.cancelAnimationFrame(rafId);
+    },
+    { once: true },
+  );
+};
+
+document.querySelectorAll("[data-hold]").forEach(initHoldHub);
+
+const initStepHub = (card) => {
+  const track = card.querySelector("[data-step-track]");
+  const prints = card.querySelector("[data-step-prints]");
+  const line = card.querySelector("[data-step-line]");
+  if (!prints || !track) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const startDelay = 3600;
+  const stepInterval = 1000;
+  const stepSize = 0.08;
+  const maxProgress = 0.8;
+  const pauseDuration = 700;
+  const revealDelay = 16000;
+  const baseLeft = 20;
+  const travelRange = 58;
+  const baseTop = 50;
+  const topJitter = 6;
+
+  let progress = 0;
+  let pausedUntil = 0;
+  let lastStep = 0;
+  let rafId = 0;
+
+  const apply = (jitterY = 0) => {
+    const offset = (progress * travelRange).toFixed(2);
+    prints.style.left = `calc(${baseLeft}% + ${offset}%)`;
+    prints.style.top = `calc(${baseTop}% + ${jitterY.toFixed(2)}%)`;
+  };
+
+  if (prefersReducedMotion) {
+    apply();
+    if (line) {
+      card.classList.add("is-revealed");
+    }
+    return;
+  }
+
+  const startTime = performance.now();
+
+  const step = (now) => {
+    if (now < pausedUntil) {
+      rafId = window.requestAnimationFrame(step);
+      return;
+    }
+    if (now - startTime > startDelay && now - lastStep > stepInterval) {
+      progress = Math.min(maxProgress, progress + stepSize);
+      const jitter = (Math.random() - 0.5) * topJitter;
+      apply(jitter);
+      const trail = prints.cloneNode(true);
+      trail.classList.add("trail");
+      track.appendChild(trail);
+      lastStep = now;
+    }
+    rafId = window.requestAnimationFrame(step);
+  };
+
+  rafId = window.requestAnimationFrame(step);
+
+  const pause = () => {
+    pausedUntil = performance.now() + pauseDuration;
+  };
+
+  card.addEventListener("pointerdown", pause);
+  card.addEventListener("pointermove", pause);
+  card.addEventListener("touchmove", pause, { passive: true });
+  card.addEventListener("wheel", pause, { passive: true });
+
+  if (line) {
+    window.setTimeout(() => {
+      card.classList.add("is-revealed");
+    }, revealDelay);
+  }
+
+  window.addEventListener(
+    "pagehide",
+    () => {
+      window.cancelAnimationFrame(rafId);
+    },
+    { once: true },
+  );
+};
+
+document.querySelectorAll("[data-step]").forEach(initStepHub);
+
+const initFormationHub = (card) => {
+  const line = card.querySelector("[data-formation-line]");
+  const segments = Array.from(card.querySelectorAll("[data-formation-segment]"));
+  const text = card.querySelector(".formation-text");
+  if (!line || !segments.length) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const alignDelay = 2200;
+  const pressureDelay = 4000;
+  const revealDelay = 3000;
+  const snapBackDelay = 240;
+  const chaosThreshold = 4;
+  const chaosDuration = 1800;
+  const chaosCooldown = 320;
+
+  let chaosCount = 0;
+  let lastChaosTick = 0;
+  segments.forEach((segment, index) => {
+    const offset = (index % 2 === 0 ? -1 : 1) * (4 + (index % 3));
+    segment.style.setProperty("--segment-offset", `${offset}px`);
+  });
+
+  if (!prefersReducedMotion) {
+    window.setTimeout(() => {
+      line.classList.add("is-aligned");
+    }, alignDelay);
+    window.setTimeout(() => {
+      line.classList.add("is-pressured");
+    }, pressureDelay);
+  } else {
+    line.classList.add("is-aligned");
+  }
+
+  if (text) {
+    window.setTimeout(() => {
+      card.classList.add("is-revealed");
+    }, prefersReducedMotion ? 0 : revealDelay);
+  }
+
+  const nudge = (event) => {
+    if (card.classList.contains("is-chaos")) {
+      return;
+    }
+    const rect = line.getBoundingClientRect();
+    const relX = rect.width
+      ? (event.clientX - rect.left) / rect.width - 0.5
+      : 0;
+    segments.forEach((segment, index) => {
+      const drift = (index % 2 === 0 ? -1 : 1) * (6 + index);
+      segment.style.transform = `translateY(${drift * relX}px)`;
+    });
+    window.setTimeout(() => {
+      segments.forEach((segment) => {
+        segment.style.transform = "";
+      });
+    }, snapBackDelay);
+
+    const now = performance.now();
+    if (now - lastChaosTick > chaosCooldown) {
+      chaosCount += 1;
+      lastChaosTick = now;
+    }
+    if (chaosCount >= chaosThreshold) {
+      chaosCount = 0;
+      card.classList.add("is-chaos");
+      window.setTimeout(() => {
+        card.classList.remove("is-chaos");
+      }, chaosDuration);
+    }
+  };
+
+  card.addEventListener("pointerdown", nudge);
+  card.addEventListener("pointermove", nudge);
+  card.addEventListener("touchmove", (event) => {
+    const touch = event.touches[0];
+    if (touch) {
+      nudge(touch);
+    }
+  }, { passive: true });
+
+  window.addEventListener(
+    "pagehide",
+    () => {
+      segments.forEach((segment) => {
+        segment.style.transform = "";
+      });
+    },
+    { once: true },
+  );
+};
+
+document.querySelectorAll("[data-formation]").forEach(initFormationHub);
+
 const initLightHub = (card) => {
   const input = card.querySelector("[data-light-input]");
   const display = card.querySelector("[data-light-display]");

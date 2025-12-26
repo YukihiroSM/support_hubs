@@ -239,6 +239,146 @@ HUBS: List[Dict[str, object]] = [
         "index_title": "Хмаринка",
         "index_description": "М’яка абстрактна форма, що повільно пливе і дихає.",
     },
+    {
+        "id": "016",
+        "kind": "irony",
+        "title": "Очевидне",
+        "lead": "",
+        "short_label": "іронія",
+        "brand_label": "РІЙ · Хаб 016",
+        "show_footer": False,
+        "template": "hubs/hub_016.html",
+        "index_title": "Очевидне",
+        "index_description": (
+            "Коротка, суха правда без моралі. Вона є — і цього достатньо."
+        ),
+    },
+    {
+        "id": "017",
+        "kind": "irony",
+        "title": "Якось працює",
+        "lead": "",
+        "short_label": "іронія",
+        "brand_label": "РІЙ · Хаб 017",
+        "show_footer": False,
+        "template": "hubs/hub_017.html",
+        "index_title": "Якось працює",
+        "index_description": (
+            "Недосконалий, але робочий світ. Це не ідеально, зате тримається."
+        ),
+    },
+    {
+        "id": "018",
+        "kind": "irony",
+        "title": "План був",
+        "lead": "",
+        "short_label": "іронія",
+        "brand_label": "РІЙ · Хаб 018",
+        "show_footer": False,
+        "template": "hubs/hub_018.html",
+        "index_title": "План був",
+        "index_description": (
+            "План був, потім змінився, але робота триває. І це нормально."
+        ),
+    },
+    {
+        "id": "019",
+        "kind": "irony",
+        "title": "Факт підтверджено",
+        "lead": "",
+        "short_label": "іронія",
+        "brand_label": "РІЙ · Хаб 019",
+        "show_footer": False,
+        "template": "hubs/hub_019.html",
+        "index_title": "Факт підтверджено",
+        "index_description": (
+            "Очевидне підтверджено, змін немає. Працюємо далі."
+        ),
+    },
+    {
+        "id": "020",
+        "kind": "irony",
+        "title": "Можна йти",
+        "lead": "",
+        "short_label": "іронія",
+        "brand_label": "РІЙ · Хаб 020",
+        "show_footer": False,
+        "template": "hubs/hub_020.html",
+        "index_title": "Можна йти",
+        "index_description": (
+            "Інтенсивне підсумування й тиша. Дозвіл завершити."
+        ),
+    },
+    {
+        "id": "021",
+        "kind": "resilience",
+        "title": "Стояти",
+        "lead": "",
+        "short_label": "стійкість",
+        "brand_label": "РІЙ · Хаб 021",
+        "show_footer": False,
+        "template": "hubs/hub_021.html",
+        "index_title": "Стояти",
+        "index_description": (
+            "Опора без руху. Те, що не хитається, коли все інше пливе."
+        ),
+    },
+    {
+        "id": "022",
+        "kind": "resilience",
+        "title": "Ритм",
+        "lead": "",
+        "short_label": "витримка",
+        "brand_label": "РІЙ · Хаб 022",
+        "show_footer": False,
+        "template": "hubs/hub_022.html",
+        "index_title": "Ритм",
+        "index_description": (
+            "Повтор без прогресу. Ритм, який можна тримати довго."
+        ),
+    },
+    {
+        "id": "023",
+        "kind": "resilience",
+        "title": "Тримати",
+        "lead": "",
+        "short_label": "витримка",
+        "brand_label": "РІЙ · Хаб 023",
+        "show_footer": False,
+        "template": "hubs/hub_023.html",
+        "index_title": "Тримати",
+        "index_description": (
+            "Навантаження не зникає, але форма тримається. Витримка без руху."
+        ),
+    },
+    {
+        "id": "024",
+        "kind": "resilience",
+        "title": "Крок",
+        "lead": "",
+        "short_label": "витримка",
+        "brand_label": "РІЙ · Хаб 024",
+        "show_footer": False,
+        "template": "hubs/hub_024.html",
+        "index_title": "Крок",
+        "index_description": (
+            "Малий рух після навантаження. Повільно, рівно, без ривків."
+        ),
+    },
+    {
+        "id": "025",
+        "kind": "resilience",
+        "title": "Тримати стрій",
+        "lead": "",
+        "short_label": "витримка",
+        "brand_label": "РІЙ · Хаб 025",
+        "show_footer": False,
+        "template": "hubs/hub_025.html",
+        "index_title": "Тримати стрій",
+        "index_description": (
+            "Лінія формується і тримається. Узгодженість без героїзації."
+        ),
+    },
 ]
 HUBS_BY_ID: Dict[str, Dict[str, object]] = {hub["id"]: hub for hub in HUBS}
 
